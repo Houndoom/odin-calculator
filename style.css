@@ -30,12 +30,12 @@
 
 .digit {
   width: 3rem;
-  margin: 0 -0.8rem;
+  margin: 0 -0.6rem;
   text-align: right;
 }
 
 .decimal-point {
-  width: 0.7rem;
+  width: 2.2rem;
   text-align: center;
 }
 
