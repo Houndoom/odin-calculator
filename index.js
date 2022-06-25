@@ -23,6 +23,11 @@ function operate(func,a,b) {
 const numDigits = 13;
 let decimalPressed = false;
 let decimalExists = false;
+let plusPressed = false;
+let minusPressed = false;
+let timesPressed = false;
+let dividePressed = false;
+let currentNumber = 0;
 
 const screen = document.getElementById('screen');
 
@@ -80,11 +85,10 @@ function inputNumber(text) {
 
       /* Move decimal point */
       const decimalPoint = document.getElementById(`point${i}`);
-      const decimalPointNext = document.getElementById(`point${i+1}`);
 
       if (decimalPoint.textContent) {
-        decimalPoint.textContent = null;
-        decimalPointNext.textContent = '.';
+        toggleDecimalPoint(i);
+        toggleDecimalPoint(i+1);
       }
 
       const nextDigit = document.getElementById(`digit${i+1}`);
@@ -93,7 +97,7 @@ function inputNumber(text) {
         if (nextDigit.textContent || digit.textContent !== '0' || decimalPressed) nextDigit.textContent = digit.textContent;
         digit.textContent = text;
         if (decimalPressed) {
-          decimalPoint.textContent = '.';
+          toggleDecimalPoint(1);
           decimalExists = true;
           decimalPressed = false;
         }
@@ -115,11 +119,10 @@ function inputDoubleZero() {
 
       /* Move decimal point */
       const decimalPoint = document.getElementById(`point${i}`);
-      const decimalPointNext = document.getElementById(`point${i+2}`);
 
       if (decimalPoint.textContent) {
-        decimalPoint.textContent = null;
-        decimalPointNext.textContent = '.';
+        toggleDecimalPoint(i);
+        toggleDecimalPoint(i+2);
       }
 
       const nextDigit = document.getElementById(`digit${i+2}`);
@@ -132,7 +135,7 @@ function inputDoubleZero() {
           digit.textContent = '0';
         }
         if (decimalPressed) {
-          document.getElementById('point2').textContent = '.';
+          toggleDecimalPoint(2);
           decimalExists = true;
           decimalPressed = false;
         }
@@ -167,16 +170,67 @@ function toggleMinusSign() {
   return;
 }
 
+function toggleDecimalPoint(num) {
+  const decimalPoint = document.getElementById(`point${num}`);
+  if (!decimalPoint.textContent) decimalPoint.textContent = '.';
+  else decimalPoint.textContent = null;
+  return;
+}
+
 /* Clear buttons */
 
 const clearButton = document.getElementById('u67');
 clearButton.addEventListener('click', () => clear());
 
 function clear() {
-  const allButtons = document.querySelectorAll('.digit, .decimal-point');
-  allButtons.forEach(e => e.textContent = null);
+  const allDigits = document.querySelectorAll('.digit, .decimal-point');
+  allDigits.forEach(e => e.textContent = null);
   document.getElementById('digit1').textContent = '0';
   decimalPressed = false;
   decimalExists = false;
   return;
+}
+
+/* Operations */
+
+function screenToNumber() {
+  const allDigits = [...document.querySelectorAll('.digit, .decimal-point')];
+  digitsArray = allDigits.map(e => e.textContent);
+  return parseFloat(digitsArray.reverse().join(''));
+}
+
+function displayString(string) {
+  const reverseStringArray = string.split('').reverse();
+  for (let i = 1; i <= reverseStringArray.length; i++) {
+    document.getElementById(`digit${i}`).textContent = reverseStringArray[i - 1];
+  }
+  return;
+}
+
+function numberToScreen(num) {
+  const numString = String(num);
+  let numStringClean = numString.replace(/[.,-]/g,'');
+  if (numStringClean.length > numDigits) numStringClean = numStringClean.slice(0,numDigits);
+  const decimalLocation = numStringClean.length - numString.indexOf('.') + 1;
+
+  clear(); 
+
+  if (Math.abs(num) >= 10**numDigits) {
+    displayString('ERROR');
+    return;
+  }
+
+  if (num < 0) toggleMinusSign();
+  if (numString.indexOf('.') > 0) toggleDecimalPoint(decimalLocation);
+  displayString(numStringClean);
+}
+
+const addButton = document.getElementById('u43');
+addButton.addEventListener('click', () => add());
+
+function add() {
+  if (currentNumber) {
+    currentNumber += screenToNumber();
+    plusPressed = true;
+  }
 }
