@@ -1,24 +1,67 @@
+/* Calculator display font */
+
+@font-face {
+  font-family: display-7;
+  src: url(fonts/digital-7.ttf);
+}
+
+#calc-body {
+  margin: auto;
+  width: 33rem;
+  height: 29rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 1rem;
+}
+
+#screen {
+  flex: 1;
+  border-style: solid;
+  font-family: display-7;
+  font-size: 70px;
+  text-align: right;
+  margin: 1rem;
+  padding: 0rem 0.6rem;
+  display: flex;
+}
+
+.digit {
+  width: 3rem;
+  margin: 0 -0.8rem;
+  text-align: center;
+}
+
+.decimal-point {
+  width: 0.7rem;
+  text-align: center;
+}
+
+/* Buttons */
+
 #buttons {
   display: grid;
-  grid-template-columns: auto auto auto auto;
-  justify-content: center;
+  grid-template-columns: 7.5rem 5rem 5rem 5rem 7.5rem ;
+  grid-template-rows: repeat(5,4rem);
+  gap: 0.5rem;
 }
 
-.normal-button {
-  width: 2rem;
+button {
+  font-size: 2rem;
   background-color: grey;
+  border-style: solid;
+  border-radius: 10px;
 }
 
-#u48 {
-  grid-column-start: 1;
-  grid-column-end: 3;
-  background-color: grey;
-}
-
-#u61 {
-  grid-column-start: 4;
-  grid-column-end: 5;
+#u43 {
+  grid-column-start: 5;
+  grid-column-end: 6;
   grid-row-start: 4;
   grid-row-end: 6;
   background-color: grey;
+}
+
+.col0, .col4{
+  margin: 0 1.25rem;
 }
