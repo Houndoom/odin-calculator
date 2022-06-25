@@ -23,14 +23,15 @@
   font-size: 70px;
   text-align: right;
   margin: 1rem;
-  padding: 0rem 0.6rem;
+  padding: 0 1rem 0 0.2rem;
   display: flex;
+  flex-direction: row-reverse;
 }
 
 .digit {
   width: 3rem;
   margin: 0 -0.8rem;
-  text-align: center;
+  text-align: right;
 }
 
 .decimal-point {
