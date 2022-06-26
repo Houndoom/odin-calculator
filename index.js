@@ -118,6 +118,14 @@ const digitButton = document.getElementById('u4848');
 digitButton.addEventListener('click',() => inputDoubleZero());
 
 function inputDoubleZero() {
+  if (resolved) {
+    clear(resetDecimalPress = false);
+    resolved = false;
+    if (minusPressed) {
+      toggleMinusSign();
+      minusPressed = false;
+    }
+  }
   for (let i = numDigits - 1; i >= 1; i--) {
     const digit = document.getElementById(`digit${i}`);
     if (i === numDigits - 1 && !!digit.textContent) return;
@@ -200,6 +208,18 @@ function clear(resetDecimalPress = true) {
   document.getElementById('digit1').textContent = '0';
   if (resetDecimalPress) decimalPressed = false;
   decimalExists = false;
+  minusPressed = false;
+  return;
+}
+
+const allClearButton = document.getElementById('u6567');
+allClearButton.addEventListener('click', () => allClear());
+
+function allClear() {
+  clear();
+  operationPressed = null;
+  currentNumber = 0;
+  resolved = false;
   return;
 }
 
