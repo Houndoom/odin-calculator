@@ -14,20 +14,16 @@ function divide(a,b) {
   return a / b;
 }
 
-function operate(func,a,b) {
-  return func(a,b);
-}
-
 /* Set up LCD screen */
 
 const numDigits = 13;
 let decimalPressed = false;
 let decimalExists = false;
-let plusPressed = false;
+let operationPressed = null;
 let minusPressed = false;
-let timesPressed = false;
-let dividePressed = false;
 let currentNumber = 0;
+let resolved = false;
+const operations = [add,subtract,multiply,divide];
 
 const screen = document.getElementById('screen');
 
@@ -78,6 +74,14 @@ for (let i = 48; i <= 57; i++) {
 }
 
 function inputNumber(text) {
+  if (resolved) {
+    clear(resetDecimalPress = false);
+    resolved = false;
+    if (minusPressed) {
+      toggleMinusSign();
+      minusPressed = false;
+    }
+  }
   for (let i = numDigits; i >= 1; i--) {
     const digit = document.getElementById(`digit${i}`);
     if (i === numDigits && !!digit.textContent) return;
@@ -94,7 +98,9 @@ function inputNumber(text) {
       const nextDigit = document.getElementById(`digit${i+1}`);
 
       if (i === 1) {
-        if (nextDigit.textContent || digit.textContent !== '0' || decimalPressed) nextDigit.textContent = digit.textContent;
+        if (nextDigit.textContent || digit.textContent !== '0' || decimalPressed) {
+          nextDigit.textContent = digit.textContent;
+        }
         digit.textContent = text;
         if (decimalPressed) {
           toggleDecimalPoint(1);
@@ -161,12 +167,18 @@ function addDecimalPoint() {
 /* Minus sign */
 
 const minusSignButton = document.getElementById('u434745');
-minusSignButton.addEventListener('click', () => toggleMinusSign());
+minusSignButton.addEventListener('click', () => pressMinusSign());
 
 function toggleMinusSign() {
   const minusSign = document.getElementById('minus-sign');
   if (!minusSign.textContent) minusSign.textContent = '-';
   else minusSign.textContent = null;
+  return;
+}
+
+function pressMinusSign() {
+  if (resolved && operationPressed != null) minusPressed = true;
+  else toggleMinusSign();
   return;
 }
 
@@ -182,11 +194,11 @@ function toggleDecimalPoint(num) {
 const clearButton = document.getElementById('u67');
 clearButton.addEventListener('click', () => clear());
 
-function clear() {
+function clear(resetDecimalPress = true) {
   const allDigits = document.querySelectorAll('.digit, .decimal-point');
   allDigits.forEach(e => e.textContent = null);
   document.getElementById('digit1').textContent = '0';
-  decimalPressed = false;
+  if (resetDecimalPress) decimalPressed = false;
   decimalExists = false;
   return;
 }
@@ -208,10 +220,10 @@ function displayString(string) {
 }
 
 function numberToScreen(num) {
+  num = parseFloat(num.toPrecision(numDigits));
   const numString = String(num);
   let numStringClean = numString.replace(/[.,-]/g,'');
-  if (numStringClean.length > numDigits) numStringClean = numStringClean.slice(0,numDigits);
-  const decimalLocation = numStringClean.length - numString.indexOf('.') + 1;
+  const decimalLocation = numStringClean.length - numString.indexOf('.') + numString.indexOf('-') + 1;
 
   clear(); 
 
@@ -225,12 +237,33 @@ function numberToScreen(num) {
   displayString(numStringClean);
 }
 
-const addButton = document.getElementById('u43');
-addButton.addEventListener('click', () => add());
-
-function add() {
-  if (currentNumber) {
-    currentNumber += screenToNumber();
-    plusPressed = true;
+function resolveOperation() {
+  if (operationPressed != null) {
+    currentNumber = operations[operationPressed](currentNumber,screenToNumber());
+    numberToScreen(currentNumber);
+    resolved = true;
   }
+  return;
+}
+
+const equalButton = document.getElementById('u61');
+equalButton.addEventListener('click', () => equalOperation());
+
+function equalOperation() {
+  resolveOperation();
+  operationPressed = null;
+  return;
+}
+
+const operationButtonIds = ['u43','u45','u215','u247'];
+
+for (let i = 0; i <= 3; i++) {
+const operationButton = document.getElementById(operationButtonIds[i]);
+operationButton.addEventListener('click', function() {
+  if (operationPressed != null) resolveOperation();
+  operationPressed = i;
+  resolved = true;
+  currentNumber = screenToNumber();
+  return;
+});
 }
