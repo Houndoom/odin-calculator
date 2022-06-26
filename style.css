@@ -33,28 +33,37 @@ body {
 
 #screen {
   width: 27.5rem;
-  height: 8vh;
+  height: 80px;
   border-style: solid;
   border-radius: 10px;
   font-family: display-7;
-  font-size: 8vh;
+  font-size: 70px;
   text-align: right;
   padding: 0 1rem 0 0.6rem;
   display: flex;
   flex-direction: row-reverse;
   background-color: rgb(200,210,200);
-  line-height: 80%;
 }
 
 .digit {
   width: 3rem;
   margin: 0 -0.6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+span {
   text-align: right;
+  height: 55px;
 }
 
 .decimal-point {
   width: 2.2rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 /* Buttons */

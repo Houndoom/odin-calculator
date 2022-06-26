@@ -15,26 +15,31 @@ const screen = document.getElementById('screen');
 
 // Screen is made up of digits (odd-numbered divs) with decimal points in between (even-numbered divs)
 // Note: divs are arranged in reverse, i.e. right to left
+// Each digit is enclosed further in a span which is vertically centered by flexbox in the digit div
 
 for (let i = 1; i <= numDigits*2; i++) {
-  const char = document.createElement('div');
+  const charDiv = document.createElement('div');
+  const char = document.createElement('span');
   if (i % 2 === 1) {
-    char.classList.add('digit');
+    charDiv.classList.add('digit');
     char.setAttribute('id',`digit${Math.ceil(i/2)}`);
     if (i === 1) char.textContent = '0'; // By default display 0 at the first digit
   } else {
-    char.classList.add('decimal-point');
+    charDiv.classList.add('decimal-point');
     char.setAttribute('id',`point${i/2}`);
   }
-  screen.appendChild(char);
+  charDiv.appendChild(char);
+  screen.appendChild(charDiv);
 }
 
 // Left most div for minus sign
 
-const char = document.createElement('div');
-char.classList.add('digit');
+const charDiv = document.createElement('div');
+const char = document.createElement('span');
+charDiv.classList.add('digit');
 char.setAttribute('id','minus-sign');
-screen.appendChild(char);
+charDiv.appendChild(char)
+screen.appendChild(charDiv);
 
 /* Set up buttons */
 
@@ -53,8 +58,8 @@ for (let i = 0; i < allSymbols.length; i++) {
   const symb = allSymbols[i];
   const buttonElement = document.createElement('button');
   buttonElement.classList.add(`col${i % 5}`);
-  buttonElement.textContent = symb;
   buttonElement.setAttribute('id',`${convertUnicode(symb)}`);
+  buttonElement.textContent = symb;
   buttons.appendChild(buttonElement);
 }
 
