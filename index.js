@@ -232,7 +232,7 @@ document.addEventListener('keyup', (e) => {if (e.key === 'Backspace') clear();})
 // Reset current display to '0', but does not reset current computation. E.g. left hand side and operation pressed are still remembered
 
 function clear(resetDecimalPress = true) {
-  const allDigits = document.querySelectorAll('.digit, .decimal-point');
+  const allDigits = document.querySelectorAll('span');
   allDigits.forEach(e => e.textContent = null);
   document.getElementById('digit1').textContent = '0';
   if (resetDecimalPress) decimalPressed = false; // Option to not reset decimalPressed, for the inputNumber function
@@ -297,7 +297,7 @@ const operations = [add,subtract,multiply,divide];
 // Returns number currently displayed on screen
 
 function screenToNumber() {
-  const allDigits = [...document.querySelectorAll('.digit, .decimal-point')];
+  const allDigits = [...document.querySelectorAll('span')];
   digitsArray = allDigits.map(e => e.textContent);
   return parseFloat(digitsArray.reverse().join('')); // reverse() required because digit divs are laid out in reverse
 }
