@@ -1,9 +1,20 @@
+function countDecimalPlaces(num) {
+  let numString = String(num);
+  if (numString.indexOf('e-') > 0) {
+    return parseInt(numString.split('e-')[1]);
+  }
+  if (numString.indexOf('.') < 0) return 0;
+  return numString.length - numString.indexOf('.') - 1;
+}
+
 function add(a,b) {
-  return a + b;
+  maxDecimalPlaces = Math.max(countDecimalPlaces(a),countDecimalPlaces(b));
+  return Math.round((a + b)*10**maxDecimalPlaces)/10**maxDecimalPlaces;
 }
 
 function subtract(a,b) {
-  return a - b;
+  maxDecimalPlaces = Math.max(countDecimalPlaces(a),countDecimalPlaces(b));
+  return Math.round((a - b)*10**maxDecimalPlaces)/10**maxDecimalPlaces;
 }
 
 function multiply(a,b) {
@@ -22,6 +33,7 @@ let decimalExists = false;
 let operationPressed = null;
 let minusPressed = false;
 let currentNumber = 0;
+let memoryNumber = null;
 let resolved = false;
 const operations = [add,subtract,multiply,divide];
 
@@ -240,8 +252,9 @@ function displayString(string) {
 }
 
 function numberToScreen(num) {
-  num = parseFloat(num.toPrecision(numDigits));
-  const numString = String(num);
+  roundedNum = parseFloat(num.toFixed(numDigits - 1));
+  truncNum = parseFloat(roundedNum.toPrecision(numDigits));
+  const numString = truncNum.toFixed(countDecimalPlaces(truncNum));
   let numStringClean = numString.replace(/[.,-]/g,'');
   const decimalLocation = numStringClean.length - numString.indexOf('.') + numString.indexOf('-') + 1;
 
@@ -252,7 +265,7 @@ function numberToScreen(num) {
     return;
   }
 
-  if (num < 0) toggleMinusSign();
+  if (truncNum < 0) toggleMinusSign();
   if (numString.indexOf('.') > 0) toggleDecimalPoint(decimalLocation);
   displayString(numStringClean);
 }
@@ -286,4 +299,43 @@ operationButton.addEventListener('click', function() {
   currentNumber = screenToNumber();
   return;
 });
+}
+
+/* Memory functions */
+
+const memoryPlusButton = document.getElementById('u7743');
+memoryPlusButton.addEventListener('click', () => memoryPlus());
+
+function memoryPlus() {
+  memoryNumber += screenToNumber();
+  resolved = true;
+  return;
+}
+
+const memoryMinusButton = document.getElementById('u7745');
+memoryMinusButton.addEventListener('click', () => memoryMinus());
+
+function memoryMinus() {
+  memoryNumber -= screenToNumber();
+  resolved = true;
+  return;
+}
+
+const memoryRevealButton = document.getElementById('u7782');
+memoryRevealButton.addEventListener('click', () => memoryReveal());
+
+function memoryReveal() {
+  if (memoryNumber != null) {
+    resolved = true;
+    numberToScreen(memoryNumber);
+  }
+  return;
+}
+
+const memoryClearButton = document.getElementById('u7767');
+memoryClearButton.addEventListener('click', () => memoryClear());
+
+function memoryClear() {
+  memoryNumber = null;
+  return;
 }
