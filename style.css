@@ -5,30 +5,41 @@
   src: url(fonts/digital-7.ttf);
 }
 
+body {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 #calc-body {
   margin: auto;
-  width: 34rem;
-  height: 29rem;
+  width: 32rem;
+  height: 32rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 2.5rem;
   border-style: solid;
+  border-radius: 15px;
+  padding: 1rem;
+  background-color: rgb(230,230,230);
 }
 
 #screen {
-  flex: 1;
-  width: 32rem;
+  width: 27.5rem;
+  height: 3.5rem;
   border-style: solid;
+  border-radius: 10px;
   font-family: display-7;
   font-size: 70px;
   text-align: right;
-  margin: 1rem;
   padding: 0 1rem 0 0.6rem;
   display: flex;
   flex-direction: row-reverse;
   align-items: stretch;
+  background-color: rgb(200,210,200);
 }
 
 .digit {
@@ -53,9 +64,10 @@
 
 button {
   font-size: 2rem;
-  background-color: grey;
+  background-color: dimgrey;
   border-style: solid;
   border-radius: 10px;
+  border-color: dimgrey;
 }
 
 #u43 {
@@ -63,7 +75,16 @@ button {
   grid-column-end: 6;
   grid-row-start: 4;
   grid-row-end: 6;
-  background-color: grey;
+}
+
+#u67, #u6567 {
+  background-color: crimson;
+  border-color: crimson;
+}
+
+.number-key {
+  background-color: darkgray;
+  border-color: darkgray;
 }
 
 .col0, .col4{

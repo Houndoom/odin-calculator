@@ -27,7 +27,7 @@ function divide(a,b) {
 
 /* Set up LCD screen */
 
-const numDigits = 13;
+const numDigits = 12;
 let decimalPressed = false;
 let decimalExists = false;
 let operationPressed = null;
@@ -83,6 +83,7 @@ for (let i = 0; i < allSymbols.length; i++) {
 for (let i = 48; i <= 57; i++) {
   const digitButton = document.getElementById(`u${i}`);
   digitButton.addEventListener('click',() => inputNumber(digitButton.textContent));
+  digitButton.classList.add('number-key');
 }
 
 function inputNumber(text) {
@@ -128,6 +129,7 @@ function inputNumber(text) {
 
 const digitButton = document.getElementById('u4848');
 digitButton.addEventListener('click',() => inputDoubleZero());
+digitButton.classList.add('number-key');
 
 function inputDoubleZero() {
   if (resolved) {
@@ -176,6 +178,7 @@ function inputDoubleZero() {
 
 const decimalPointButton = document.getElementById('u46');
 decimalPointButton.addEventListener('click', () => addDecimalPoint());
+decimalPointButton.classList.add('number-key');
 
 function addDecimalPoint() {
   if (decimalExists) return;
