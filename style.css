@@ -33,17 +33,17 @@ body {
 
 #screen {
   width: 27.5rem;
-  height: 3.5rem;
+  height: 8vh;
   border-style: solid;
   border-radius: 10px;
   font-family: display-7;
-  font-size: 70px;
+  font-size: 8vh;
   text-align: right;
   padding: 0 1rem 0 0.6rem;
   display: flex;
   flex-direction: row-reverse;
-  align-items: stretch;
   background-color: rgb(200,210,200);
+  line-height: 80%;
 }
 
 .digit {
