@@ -293,7 +293,7 @@ const operationButtonIds = ['u43','u45','u215','u247'];
 for (let i = 0; i <= 3; i++) {
 const operationButton = document.getElementById(operationButtonIds[i]);
 operationButton.addEventListener('click', function() {
-  if (operationPressed != null) resolveOperation();
+  if (!resolved) resolveOperation();
   operationPressed = i;
   resolved = true;
   currentNumber = screenToNumber();
