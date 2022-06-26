@@ -68,6 +68,12 @@ for (let i = 48; i <= 57; i++) {
   digitButton.classList.add('number-key');
 }
 
+// Keyboard input
+
+for (let i = 0; i <= 9; i++) {
+  document.addEventListener('keyup',(e) => {if(e.key === String(i)) inputNumber(String(i));});
+}
+
 function inputNumber(text) {
   // If an operation has just resolved, the resolved result is showing. Hence clear the screen for a new input instead of modifying resolved result
   if (resolved) {
@@ -170,6 +176,7 @@ function inputDoubleZero() {
 const decimalPointButton = document.getElementById('u46');
 decimalPointButton.addEventListener('click', () => addDecimalPoint());
 decimalPointButton.classList.add('number-key');
+document.addEventListener('keyup', (e) => {if (e.key === '.') addDecimalPoint();});
 
 // Add decimal point only if it doesn't already exist
 
@@ -215,6 +222,7 @@ function toggleDecimalPoint(num) {
 
 const clearButton = document.getElementById('u67');
 clearButton.addEventListener('click', () => clear());
+document.addEventListener('keyup', (e) => {if (e.key === 'Backspace') clear();});
 
 // Reset current display to '0', but does not reset current computation. E.g. left hand side and operation pressed are still remembered
 
@@ -230,6 +238,7 @@ function clear(resetDecimalPress = true) {
 
 const allClearButton = document.getElementById('u6567');
 allClearButton.addEventListener('click', () => allClear());
+document.addEventListener('keyup', (e) => {if (e.key === 'Delete') allClear();});
 
 // Clear everything, including incomplete computations. Does not affect memory functions
 
@@ -335,6 +344,7 @@ function resolveOperation() {
 
 const equalButton = document.getElementById('u61');
 equalButton.addEventListener('click', () => equalOperation());
+document.addEventListener('keyup', (e) => {if(e.key === 'Enter') equalOperation();});
 
 function equalOperation() {
   resolveOperation();
@@ -343,19 +353,23 @@ function equalOperation() {
 }
 
 const operationButtonIds = ['u43','u45','u215','u247']; // +, -, *, / in order
+const operationKeyboard = ['+','-','*','/'];
 
 for (let i = 0; i <= 3; i++) {
 const operationButton = document.getElementById(operationButtonIds[i]);
 
 // When operation is pressed, resolve any existing computation, store result as the left-hand side and store the operation pressed to await the right-hand side input
 
-operationButton.addEventListener('click', function() {
+const operationFunction = () => {
   if (!resolved) resolveOperation(); // Don't resolve successive operation presses, only when some input has been entered in between
   operationPressed = i;
   resolved = true;
   lhs = screenToNumber();
   return;
-});
+}
+
+operationButton.addEventListener('click', operationFunction);
+document.addEventListener('keyup', (e) => {if(e.key === operationKeyboard[i]) operationFunction();}); // Keyboard input
 }
 
 /* Memory functions */
