@@ -5,6 +5,8 @@
   src: url(fonts/digital-7.ttf);
 }
 
+/* Body */
+
 body {
   height: 100vh;
   display: flex;
@@ -26,6 +28,8 @@ body {
   padding: 1rem;
   background-color: rgb(230,230,230);
 }
+
+/* LCD screen */
 
 #screen {
   width: 27.5rem;

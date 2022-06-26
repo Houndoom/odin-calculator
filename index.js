@@ -1,56 +1,35 @@
-function countDecimalPlaces(num) {
-  let numString = String(num);
-  if (numString.indexOf('e-') > 0) {
-    return parseInt(numString.split('e-')[1]);
-  }
-  if (numString.indexOf('.') < 0) return 0;
-  return numString.length - numString.indexOf('.') - 1;
-}
+/* Global variables */
 
-function add(a,b) {
-  maxDecimalPlaces = Math.max(countDecimalPlaces(a),countDecimalPlaces(b));
-  return Math.round((a + b)*10**maxDecimalPlaces)/10**maxDecimalPlaces;
-}
-
-function subtract(a,b) {
-  maxDecimalPlaces = Math.max(countDecimalPlaces(a),countDecimalPlaces(b));
-  return Math.round((a - b)*10**maxDecimalPlaces)/10**maxDecimalPlaces;
-}
-
-function multiply(a,b) {
-  return a * b;
-}
-
-function divide(a,b) {
-  return a / b;
-}
+const numDigits = 12; // Total number of digits on screen
+let decimalPressed = false; // Indicator for whether the decimal point button has been pressed
+let decimalExists = false; // Indicator for whether the screen number contains a decimal point
+let operationPressed = null; // Indicator for four basic operations. {0: +, 1: -, 2:*, 3:/}
+let minusPressed = false; // Indicator for whether the +/- button has been pressed
+let lhs = 0; // Left hand side of computation
+let memoryNumber = null; // Number stored using memory functions
+let resolved = false; // Indicator for whether an operation has just resolved and the result is displayed
 
 /* Set up LCD screen */
 
-const numDigits = 12;
-let decimalPressed = false;
-let decimalExists = false;
-let operationPressed = null;
-let minusPressed = false;
-let currentNumber = 0;
-let memoryNumber = null;
-let resolved = false;
-const operations = [add,subtract,multiply,divide];
-
 const screen = document.getElementById('screen');
+
+// Screen is made up of digits (odd-numbered divs) with decimal points in between (even-numbered divs)
+// Note: divs are arranged in reverse, i.e. right to left
 
 for (let i = 1; i <= numDigits*2; i++) {
   const char = document.createElement('div');
   if (i % 2 === 1) {
     char.classList.add('digit');
     char.setAttribute('id',`digit${Math.ceil(i/2)}`);
-    if (i === 1) char.textContent = '0';
+    if (i === 1) char.textContent = '0'; // By default display 0 at the first digit
   } else {
     char.classList.add('decimal-point');
     char.setAttribute('id',`point${i/2}`);
   }
   screen.appendChild(char);
 }
+
+// Left most div for minus sign
 
 const char = document.createElement('div');
 char.classList.add('digit');
@@ -61,6 +40,9 @@ screen.appendChild(char);
 
 const allSymbols = ['MC','MR','M-','M+','\u00f7','+/-','7','8','9','\u00d7','C','4','5','6','-','AC','1','2','3','+','0','00','.','='];
 const buttons = document.getElementById('buttons');
+
+// Function to convert button strings to unicode for id, as not all symbols are allowed values for id
+// Function converts each character in string to its unicode
 
 function convertUnicode(string) {
   const stringArray = string.split('');
@@ -87,22 +69,26 @@ for (let i = 48; i <= 57; i++) {
 }
 
 function inputNumber(text) {
+  // If an operation has just resolved, the resolved result is showing. Hence clear the screen for a new input instead of modifying resolved result
   if (resolved) {
-    clear(resetDecimalPress = false);
+    clear(resetDecimalPress = false); // Keep decimal press indicator in order to put decimal point at the first digit later in the function
     resolved = false;
+    // If - was pressed after an operation resolved, - should be tagged onto the new input
     if (minusPressed) {
       toggleMinusSign();
       minusPressed = false;
     }
   }
+  // Loop through number displays starting from leftmost one
   for (let i = numDigits; i >= 1; i--) {
     const digit = document.getElementById(`digit${i}`);
-    if (i === numDigits && !!digit.textContent) return;
+    if (i === numDigits && !!digit.textContent) return; // If the leftmost digit is non-blank, display is full
+    // For each non-blank digit
     if (!!digit.textContent) {
 
-      /* Move decimal point */
       const decimalPoint = document.getElementById(`point${i}`);
 
+      // Move decimal point one spot left if it is present
       if (decimalPoint.textContent) {
         toggleDecimalPoint(i);
         toggleDecimalPoint(i+1);
@@ -110,18 +96,22 @@ function inputNumber(text) {
 
       const nextDigit = document.getElementById(`digit${i+1}`);
 
+      // Special treatment for first digit
       if (i === 1) {
+        // If decimal is pressed, or if display is just not just '0', then move the first digit left one spot. If it's just '0', don't move it (unless decimal was pressed)
         if (nextDigit.textContent || digit.textContent !== '0' || decimalPressed) {
           nextDigit.textContent = digit.textContent;
         }
-        digit.textContent = text;
+        digit.textContent = text; // First digit is replaced with pressed number
+        // If decimal is pressed, put decimal point at first spot 
+        // Note: toggleDecimalPoint will not trigger if decimal point already exists
         if (decimalPressed) {
           toggleDecimalPoint(1);
           decimalExists = true;
           decimalPressed = false;
         }
       } else {
-        nextDigit.textContent = digit.textContent;
+        nextDigit.textContent = digit.textContent; // For all other digits, just move it left one spot
       }
     };
   }
@@ -130,6 +120,8 @@ function inputNumber(text) {
 const digitButton = document.getElementById('u4848');
 digitButton.addEventListener('click',() => inputDoubleZero());
 digitButton.classList.add('number-key');
+
+// See comments for function inputNumber. Very similar except digits and decimal points are moved two spots down
 
 function inputDoubleZero() {
   if (resolved) {
@@ -145,7 +137,6 @@ function inputDoubleZero() {
     if (i === numDigits - 1 && !!digit.textContent) return;
     if (!!digit.textContent) {
 
-      /* Move decimal point */
       const decimalPoint = document.getElementById(`point${i}`);
 
       if (decimalPoint.textContent) {
@@ -180,6 +171,8 @@ const decimalPointButton = document.getElementById('u46');
 decimalPointButton.addEventListener('click', () => addDecimalPoint());
 decimalPointButton.classList.add('number-key');
 
+// Add decimal point only if it doesn't already exist
+
 function addDecimalPoint() {
   if (decimalExists) return;
   decimalPressed = true;
@@ -192,6 +185,8 @@ function addDecimalPoint() {
 const minusSignButton = document.getElementById('u434745');
 minusSignButton.addEventListener('click', () => pressMinusSign());
 
+// Toggle left-most digit (minus sign) on or off
+
 function toggleMinusSign() {
   const minusSign = document.getElementById('minus-sign');
   if (!minusSign.textContent) minusSign.textContent = '-';
@@ -199,11 +194,15 @@ function toggleMinusSign() {
   return;
 }
 
+// If operation has just resolved, set minusPressed to true to tag on to new input instead of modifying resolved output
+
 function pressMinusSign() {
   if (resolved && operationPressed != null) minusPressed = true;
   else toggleMinusSign();
   return;
 }
+
+// Toggle decimal point at position num on or off
 
 function toggleDecimalPoint(num) {
   const decimalPoint = document.getElementById(`point${num}`);
@@ -217,11 +216,13 @@ function toggleDecimalPoint(num) {
 const clearButton = document.getElementById('u67');
 clearButton.addEventListener('click', () => clear());
 
+// Reset current display to '0', but does not reset current computation. E.g. left hand side and operation pressed are still remembered
+
 function clear(resetDecimalPress = true) {
   const allDigits = document.querySelectorAll('.digit, .decimal-point');
   allDigits.forEach(e => e.textContent = null);
   document.getElementById('digit1').textContent = '0';
-  if (resetDecimalPress) decimalPressed = false;
+  if (resetDecimalPress) decimalPressed = false; // Option to not reset decimalPressed, for the inputNumber function
   decimalExists = false;
   minusPressed = false;
   return;
@@ -230,53 +231,103 @@ function clear(resetDecimalPress = true) {
 const allClearButton = document.getElementById('u6567');
 allClearButton.addEventListener('click', () => allClear());
 
+// Clear everything, including incomplete computations. Does not affect memory functions
+
 function allClear() {
   clear();
   operationPressed = null;
-  currentNumber = 0;
+  lhs = 0;
   resolved = false;
   return;
 }
 
 /* Operations */
 
+// Function to count decimal places for a given number
+
+function countDecimalPlaces(num) {
+  let numString = String(num);
+
+  // parseInt does not convert exponential to decimal notation for negative exponents
+  if (numString.indexOf('e-') > 0) {
+    return parseInt(numString.split('e-')[1]);
+  }
+
+  // 0 decimal places if decimal place not found
+  if (numString.indexOf('.') < 0) return 0;
+  return numString.length - numString.indexOf('.') - 1;
+}
+
+function add(a,b) {
+  // Ensure accuracy of float arithmetic
+  maxDecimalPlaces = Math.max(countDecimalPlaces(a),countDecimalPlaces(b));
+  return Math.round((a + b)*10**maxDecimalPlaces)/10**maxDecimalPlaces;
+}
+
+function subtract(a,b) {
+  // Ensure accuracy of float arithmetic
+  maxDecimalPlaces = Math.max(countDecimalPlaces(a),countDecimalPlaces(b));
+  return Math.round((a - b)*10**maxDecimalPlaces)/10**maxDecimalPlaces;
+}
+
+function multiply(a,b) {
+  return a * b;
+}
+
+function divide(a,b) {
+  return a / b;
+}
+
+const operations = [add,subtract,multiply,divide];
+
+// Returns number currently displayed on screen
+
 function screenToNumber() {
   const allDigits = [...document.querySelectorAll('.digit, .decimal-point')];
   digitsArray = allDigits.map(e => e.textContent);
-  return parseFloat(digitsArray.reverse().join(''));
+  return parseFloat(digitsArray.reverse().join('')); // reverse() required because digit divs are laid out in reverse
 }
 
+// Displays string on screen
+
 function displayString(string) {
-  const reverseStringArray = string.split('').reverse();
+  const reverseStringArray = string.split('').reverse(); // reverse() required because digit divs are laid out in reverse
   for (let i = 1; i <= reverseStringArray.length; i++) {
     document.getElementById(`digit${i}`).textContent = reverseStringArray[i - 1];
   }
   return;
 }
 
+// Displays number on screen
+
 function numberToScreen(num) {
-  roundedNum = parseFloat(num.toFixed(numDigits - 1));
-  truncNum = parseFloat(roundedNum.toPrecision(numDigits));
-  const numString = truncNum.toFixed(countDecimalPlaces(truncNum));
-  let numStringClean = numString.replace(/[.,-]/g,'');
-  const decimalLocation = numStringClean.length - numString.indexOf('.') + numString.indexOf('-') + 1;
+  // Keep digits to display within numDigits
+  roundedNum = parseFloat(num.toFixed(numDigits - 1)); // At most numDigits - 1 decimal places (rounds very small numbers like 1e-15 to 0)
+  truncNum = parseFloat(roundedNum.toPrecision(numDigits)); // At most numDigits significant figures
+  const numString = truncNum.toFixed(countDecimalPlaces(truncNum)); // Expands exponential notation, otherwise does nothing if already in decimal form
+  let numStringClean = numString.replace(/[.,-]/g,''); // String with only the digits
+  const decimalLocation = numStringClean.length - numString.indexOf('.') + numString.indexOf('-') + 1; // Counts which decimal point to toggle
 
   clear(); 
 
+  // If number too large, display 'ERROR'
   if (Math.abs(num) >= 10**numDigits) {
     displayString('ERROR');
     return;
   }
 
+  // Add - and . if necessary to the display then display the digits
   if (truncNum < 0) toggleMinusSign();
   if (numString.indexOf('.') > 0) toggleDecimalPoint(decimalLocation);
   displayString(numStringClean);
 }
 
+// Given a pressed operation and a left-hand side, perform the operation with the number on screen as the right-hand side, and display the resolved result
+
 function resolveOperation() {
   if (operationPressed != null) {
-    currentNumber = operations[operationPressed](currentNumber,screenToNumber());
-    numberToScreen(currentNumber);
+    lhs = operations[operationPressed](lhs,screenToNumber());
+    numberToScreen(lhs);
     resolved = true;
   }
   return;
@@ -291,15 +342,18 @@ function equalOperation() {
   return;
 }
 
-const operationButtonIds = ['u43','u45','u215','u247'];
+const operationButtonIds = ['u43','u45','u215','u247']; // +, -, *, / in order
 
 for (let i = 0; i <= 3; i++) {
 const operationButton = document.getElementById(operationButtonIds[i]);
+
+// When operation is pressed, resolve any existing computation, store result as the left-hand side and store the operation pressed to await the right-hand side input
+
 operationButton.addEventListener('click', function() {
-  if (!resolved) resolveOperation();
+  if (!resolved) resolveOperation(); // Don't resolve successive operation presses, only when some input has been entered in between
   operationPressed = i;
   resolved = true;
-  currentNumber = screenToNumber();
+  lhs = screenToNumber();
   return;
 });
 }
